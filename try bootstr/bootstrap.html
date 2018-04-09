@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <link href="bootstrap.css" rel="stylesheet"/>
+    <!--<link href="style.css" rel="stylesheet"/>-->
+    <link href="jquery.dynatable.css" rel="stylesheet"/>
+<script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="jquery-ui.js"></script>
+    <script type="text/javascript" src="popper.min.js"></script>
+    <script type="text/javascript" src="bootstrap.js"></script>
+    <script type="text/javascript" src="jquery.dynatable.js"></script>
+</head>
+
+<body>
+<div class="container-fluid">
+<div class="row justify-content-between">
+
+</div> <!-- row -->
+
+
+<div class="row">
+    <div class="col-auto">
+
+<form>
+
+<button type="button" class="btn btn-primary">Edit</button>
+<table id="my-final-table" class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">First</th>
+      <th scope="col">Last</th>
+      <th scope="col">Handle</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+</form>
+
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">footer</div>
+</div>  <!-- row 3 -->
+
+</div> <!-- container-fluid -->
+
+<script>
+/* var my_JSON_object;
+var http_request = new XMLHttpRequest();
+http_request.open("GET", url, true);
+http_request.responseType = "json";
+http_request.onreadystatechange = function () {
+  var done = 4, ok = 200;
+  if (http_request.readyState === done && http_request.status === ok) {
+    my_JSON_object = http_request.response;
+  }
+};
+http_request.send(null); */
+/*    my_JSON_object = ' \
+{ "header": [id , name
+  "data": [ {"id": "1", "name": "engagement1"}, \
+            {"id": "1", "name": "engagement1"}, \
+            {"id": "1", "name": "engagement1"} \
+          ] }';
+    */
+var my_JSON_object = '[ {"id": "1", "name": "engagement1"}, \
+                        {"id": "1", "name": "engagement1"}, \
+                        {"id": "1", "name": "engagement1"} \
+                      ]';
+var data = JSON.parse(my_JSON_object);
+
+$('#my-final-table').dynatable({
+  dataset: { records: data }
+});
+
+
+
+
+</script>
+
+<!--
+        <tr>
+        <th scope="row"><div class="form-check"><input class="form-check-input" type="checkbox" value="" id="tch1"></div></th>
+      <td>Mark</td>
+      <td>Otto</td>
+      <td>@mdo</td>
+    </tr>
+    <tr>
+      <th scope="row"><div class="form-check"><input class="form-check-input" type="checkbox" value="" id="tch2"></div></th>
+      <td>Jacob</td>
+      <td>Thornton</td>
+      <td>@fat</td>
+    </tr>
+    <tr>
+      <th scope="row"><div class="form-check"><input class="form-check-input" type="checkbox" value="" id="tch3"></div></th>
+      <td>Larry</td>
+      <td>the Bird</td>
+      <td>@twitter</td>
+    </tr>
+-->
+</body>
+</html>

@@ -10,6 +10,9 @@ from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy import DateTime
 
+from sqlalchemy.ext.declarative import declarative_base
+Base = declarative_base()
+
 # TODO:  do like in odoo?
 #class AccountAccountType(models.Model):
 #    _name = "account.account.type"

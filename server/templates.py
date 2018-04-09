@@ -14,7 +14,7 @@ class Tmplt(object):
 
     def __init__(self):
         tmplt_dirs = [os.path.join(config['basedir'],'static/templates'), ]
-        self.tmplt_lookup = TemplateLookup(directories=tmplt_dirs, collection_size=500) #module_directory='/tmp/mako_modules'
+        self.tmplt_lookup = TemplateLookup(directories=tmplt_dirs, strict_undefined=True, collection_size=500) #module_directory='/tmp/mako_modules'
 #        print tmplt_dirs
 
     def render(self, template, qcontext):
