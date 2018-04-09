@@ -1,0 +1,145 @@
+
+              wsgi_app
+
+httpd_srv ->  environ, start_response
+              
+              generate response with environ->params <--- html
+              url -> function
+
+          <- return response(environ, start_response)
+
+
+
+add class meth to MAP obj of WSGI app class
+
+class ():
+    def on_endpoint(self, request, **values):
+        return self.render_template('new_url.html', error=error, url=url)
+
+self.url_map = Map([
+    Rule('/', endpoint='new_url'),
+    Rule('/<short_id>', endpoint='follow_short_link'),
+    Rule('/<short_id>+', endpoint='short_link_details')
+])
+
+
+def route(route=None, **kw):
+    def decorator(f):
+        @functools.wraps(f)
+        def response_wrap(*args, **kw):
+            response = f(*args, **kw)
+            if isinstance(response, Response) or f.routing_type == 'json':
+                return response
+            if isinstance(response, basestring):
+                return Response(response)
+            return response
+        response_wrap.routing = routing
+        response_wrap.original_func = f
+        return response_wrap
+    return decorator
+
+
+
+
+def dispatch_request(self, request):
+    adapter = self.url_map.bind_to_environ(request.environ)
+    try:
+        endpoint, values = adapter.match()
+        return getattr(self, 'on_' + endpoint)(request, **values)
+    except HTTPException, e:
+        return e
+
+def on_new_url(self, request):
+    error = None
+    url = ''
+    if request.method == 'POST':
+        url = request.form['url']
+        if not is_valid_url(url):
+            error = 'Please enter a valid URL'
+        else:
+            short_id = self.insert_url(url)
+            return redirect('/%s+' % short_id)
+    return self.render_template('new_url.html', error=error, url=url)
+
+def render_template(self, template_name, **context):
+    t = self.jinja_env.get_template(template_name)
+    return Response(t.render(context), mimetype='text/html')
+
+
+
+
+class Root(object):
+    """Root WSGI application for the OpenERP Web Client.
+    app = werkzeug.wsgi.
+    dipatch requests
+
+class Response(werkzeug.wrappers.Response):
+    """ Response object passed through controller route chain.
+    def render(self):
+        """ Renders the Response's template, returns the result
+
+class WebRequest(object):
+    """ Parent class for all Odoo Web request types, mostly deals with
+    initialization and setup of the request object (the dispatching itself has
+    to be handled by the subclasses)
+
+
+
+
+
+
+class Controller(object):
+    __metaclass__ = ControllerType
+
+class Home(http.Controller):
+
+    @http.route('/', type='http', auth="none")
+    def index(self, s_action=None, db=None, **kw):
+        return http.local_redirect('/web', query=request.params, keep_hash=True)
+
+    # ideally, this route should be `auth="user"` but that don't work in non-monodb mode.
+    @http.route('/web', type='http', auth="none")
+    def web_client(self, s_action=None, **kw):
+        ensure_db()
+        if not request.session.uid:
+            return werkzeug.utils.redirect('/web/login', 303)
+        if kw.get('redirect'):
+            return werkzeug.utils.redirect(kw.get('redirect'), 303)
+
+        request.uid = request.session.uid
+        context = request.env['ir.http'].webclient_rendering_context()
+
+        return request.render('web.webclient_bootstrap', qcontext=context)
+
+    @http.route('/web/dbredirect', type='http', auth="none")
+    def web_db_redirect(self, redirect='/', **kw):
+        ensure_db()
+        return werkzeug.utils.redirect(redirect, 303)
+
+    @http.route('/web/login', type='http', auth="none")
+    def web_login(self, redirect=None, **kw):
+        ensure_db()
+        request.params['login_success'] = False
+        if request.httprequest.method == 'GET' and redirect and request.session.uid:
+            return http.redirect_with_hash(redirect)
+
+        if not request.uid:
+            request.uid = odoo.SUPERUSER_ID
+
+        values = request.params.copy()
+        try:
+            values['databases'] = http.db_list()
+        except odoo.exceptions.AccessDenied:
+            values['databases'] = None
+
+        if request.httprequest.method == 'POST':
+            old_uid = request.uid
+            uid = request.session.authenticate(request.session.db, request.params['login'], request.params['password'])
+            if uid is not False:
+                request.params['login_success'] = True
+                if not redirect:
+                    redirect = '/web'
+                return http.redirect_with_hash(redirect)
+            request.uid = old_uid
+            values['error'] = _("Wrong login/password")
+        return request.render('web.login', values)

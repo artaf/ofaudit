@@ -1,0 +1,111 @@
+class ControllerType(type):
+    def __init__(cls, name, bases, attrs):
+        super(ControllerType, cls).__init__(name, bases, attrs)
+
+        # flag old-style methods with req as first argument
+        for k, v in attrs.items():
+            if inspect.isfunction(v) and hasattr(v, 'original_func'):
+                # Set routing type on original functions
+                routing_type = v.routing.get('type')
+                parent = [claz for claz in bases if isinstance(claz, ControllerType) and hasattr(claz, k)]
+                parent_routing_type = getattr(parent[0], k).original_func.routing_type if parent else routing_type or 'http'
+                if routing_type is not None and routing_type is not parent_routing_type:
+                    routing_type = parent_routing_type
+                    _logger.warn("Subclass re-defines <function %s.%s.%s> with different type than original."
+                                    " Will use original type: %r" % (cls.__module__, cls.__name__, k, parent_routing_type))
+                v.original_func.routing_type = routing_type or parent_routing_type
+
+                spec = inspect.getargspec(v.original_func)
+                first_arg = spec.args[1] if len(spec.args) >= 2 else None
+                if first_arg in ["req", "request"]:
+                    v._first_arg_is_req = True
+
+        # store the controller in the controllers list
+        name_class = ("%s.%s" % (cls.__module__, cls.__name__), cls)
+        class_path = name_class[0].split(".")
+        if not class_path[:2] == ["odoo", "addons"]:
+            module = ""
+        else:
+            # we want to know all modules that have controllers
+            module = class_path[2]
+        # but we only store controllers directly inheriting from Controller
+        if not "Controller" in globals() or not Controller in bases:
+            return
+        controllers_per_module[module].append(name_class)
+
+class Controller(object):
+    __metaclass__ = ControllerType
+
+class Menu(http.Controller):
+
+    @http.route('/web/menu/load_needaction', type='json', auth="user")
+    def load_needaction(self, menu_ids):
+        """ Loads needaction counters for specific menu ids.
+
+            :return: needaction data
+            :rtype: dict(menu_id: {'needaction_enabled': boolean, 'needaction_counter': int})
+        """
+        return request.env['ir.ui.menu'].browse(menu_ids).get_needaction_data()
+
+
+def route(route=None, **kw):
+    """Decorator marking the decorated method as being a handler for
+    requests. The method must be part of a subclass of ``Controller``.
+
+    :param route: string or array. The route part that will determine which
+                  http requests will match the decorated method. Can be a
+                  single string or an array of strings. See werkzeug's routing
+                  documentation for the format of route expression (
+                  http://werkzeug.pocoo.org/docs/routing/ ).
+    :param type: The type of request, can be ``'http'`` or ``'json'``.
+    :param auth: The type of authentication method, can on of the following:
+
+                 * ``user``: The user must be authenticated and the current request
+                   will perform using the rights of the user.
+                 * ``public``: The user may or may not be authenticated. If she isn't,
+                   the current request will perform using the shared Public user.
+                 * ``none``: The method is always active, even if there is no
+                   database. Mainly used by the framework and authentication
+                   modules. There request code will not have any facilities to access
+                   the database nor have any configuration indicating the current
+                   database nor the current user.
+    :param methods: A sequence of http methods this route applies to. If not
+                    specified, all methods are allowed.
+    :param cors: The Access-Control-Allow-Origin cors directive value.
+    :param bool csrf: Whether CSRF protection should be enabled for the route.
+
+                      Defaults to ``True``. See :ref:`CSRF Protection
+                      <csrf>` for more.
+
+    """
+    routing = kw.copy()
+    assert 'type' not in routing or routing['type'] in ("http", "json")
+    def decorator(f):
+        if route:
+            if isinstance(route, list):
+                routes = route
+            else:
+                routes = [route]
+            routing['routes'] = routes
+        @functools.wraps(f)
+        def response_wrap(*args, **kw):
+            response = f(*args, **kw)
+            if isinstance(response, Response) or f.routing_type == 'json':
+                return response
+
+            if isinstance(response, basestring):
+                return Response(response)
+
+            if isinstance(response, werkzeug.exceptions.HTTPException):
+                response = response.get_response(request.httprequest.environ)
+            if isinstance(response, werkzeug.wrappers.BaseResponse):
+                response = Response.force_type(response)
+                response.set_default()
+                return response
+
+            _logger.warn("<function %s.%s> returns an invalid response type for an http request" % (f.__module__, f.__name__))
+            return response
+        response_wrap.routing = routing
+        response_wrap.original_func = f
+        return response_wrap
+    return decorator

@@ -1,0 +1,14 @@
+#topmenu { margin: 5px; }
+#topmenu ul { list-style: none; margin: 0; padding: 0; /*position:relative; *//*float:left; */ }
+#topmenu ul li a { color: green; text-decoration: none; padding: 0 5px; /*display:block;*/ }
+#topmenu ul li.current-menu-item { background: lightgrey; }
+#topmenu ul li:hover { background: #f6f6f6; }
+#topmenu ul li { margin: 0; padding: 0; position: relative; display: inline; /*float:left;*/ }
+#topmenu ul ul { background: #fffe; display: none; position: absolute; top: 100%; left: 0; padding: 0; }
+
+/* TODO: solve width problem */
+
+#topmenu ul ul li { display: list-item; /*min-width: 100px; width: 100%;*/ }
+#topmenu ul ul a { padding: 5px 5px }
+#topmenu ul li:hover > ul { display: block; min-width: 100px; }
+/*#topmenu ul ul ul { top:0; left: 100% }*/

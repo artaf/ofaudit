@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!--<link rel="stylesheet" href="topmenu.css"/>-->
+    <link rel="stylesheet" href="style.css"/>
+    <link rel="stylesheet" href="../static/css/jquery-ui.css"/>
+    <script type="text/javascript" src="../static/js/jquery.js"></script>
+    <script type="text/javascript" src="../static/js/jquery-ui.js"></script>
+</head>
+
+<body>
+<div class="wrapper">
+<div class="contentall">
+
+<div class="userbar">%company% %user%</div>
+
+<nav>
+<ul id="topmenu">
+    <li class="current-menu-item"><a href="#">Home</a></li>
+    <li><a href="#">Menu 1</a>
+        <ul>
+            <li><a href="#">Sub Menu 1.1</a></li>
+            <li><a href="#">Sub Menu 1.2</a></li>
+        </ul>
+    </li>
+    <li><a href="#">Menu 3</a>
+        <ul>
+            <li><a href="#">Sub Menu 3.1</a></li>
+            <li><a href="#">Sub Menu 3.2</a></li>
+            <li><a href="#">Sub Menu 3.3</a></li>
+        </ul>
+    </li>
+    <li><a href="#">Menu 4</a></li>
+</ul>
+</nav>
+
+<ul id="menu">
+  <li>
+    <div>Item 1</div>
+  </li>
+  <li>
+    <div>Item 2</div>
+  </li>
+  <li>
+    <div>Item 3</div>
+    <ul>
+      <li>
+        <div>Item 3-1</div>
+      </li>
+      <li>
+        <div>Item 3-2</div>
+      </li>
+      <li>
+        <div>Item 3-3</div>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <div>Item 4</div>
+  </li>
+  <li>
+    <div>Item 5</div>
+  </li>
+</ul>
+
+
+<div class="cont">
+
+
+
+</div>
+
+</div>
+<div class="footer">footer</div>
+
+</div>
+
+<script>
+
+
+$( "#menu" ).menu();
+
+$( "#topmenu" ).menu(  );
+
+
+</script>
+
+</body>
+</html>

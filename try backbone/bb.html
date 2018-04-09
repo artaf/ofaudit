@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <link href="bootstrap.css" rel="stylesheet"/>
+    <!--<link href="style.css" rel="stylesheet"/>-->
+    <script type="text/javascript" src="../static/js/lib/jquery.js"></script>
+<!--    <script type="text/javascript" src="../static/js/jquery-ui.js"></script>-->
+    <script type="text/javascript" src="../static/js/lib/underscore-min.js"></script>
+    <script type="text/javascript" src="backbone-min.js"></script>
+    <script type="text/javascript" src="backbone.table.js"></script>
+</head>
+
+<body>
+
+
+
+<script>
+
+$(function(){
+
+//[{"id": 1}] ..... populates a Collection with one model.
+//{"id": 1} ....... populates a Model with one attribute.
+
+    var json_obj = '[ {"id": 1, "title": "Pride and Prejudice"}, {"id": 4, "title": "The Great Gatsby"} ]';
+
+    var m = Backbone.Model.extend({
+        initialize: function() { },
+        defaults: { }
+
+    });
+
+    var c = Backbone.Collection.extend({
+        //url: "/url",
+        model: m,
+        parse: function(data) {
+            //return data.
+            return this;
+        }
+    });
+
+    var AppView = Backbone.View.extend({
+        tagName: "li",
+        el: "div", // default
+        className: "document-row",
+        initialize: function() {
+            this.listenTo(this.model, "change", this.render);
+        },
+
+        template: _.template(''), // underscore's template
+        render: function() {
+            this.$el.html(this.template(this.model.attributes));
+            return this;
+        }
+
+    });
+    var App = new AppView;
+
+});
+
+$("body").append("fuck");
+
+
+
+/* Create columns array where columns take advantage
+* of the getValue() method.
+*/
+var vertebrate_columns = [
+    {
+        header: "Class",
+        className: "vertebrate-class",
+        getFormatted: function() {
+            return "<a href='" + this.get("wiki_url") + "' target='_blank'>" + this.get("tax_class") + "</a>";
+        },
+        getValue: function() {
+            return this.get("tax_class");            
+        }
+    },{
+        header: "Description",
+        className: "vertebrate-description",
+        getFormatted: function() {
+            return this.get("description");
+        }
+    },{
+        header: "Average Cost",
+        className: "vertebrate-cost",
+        getFormatted: function() {
+            return this.get("cost");
+        },        
+        getValue: function() {
+            return this.get("cost").replace(/[^\d]/g, "");
+        }
+        
+    }
+];
+
+
+// Create the table.
+var vertebrate_table = new Backbone.Table({
+    collection: vertebrates,
+    columns: vertebrate_columns
+});
+// Render and append the table.
+$("#main").append(vertebrate_table.render().el);
+
+
+</script>
+
+</body>
+</html>

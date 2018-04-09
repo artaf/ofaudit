@@ -1,0 +1,42 @@
+#check_root_user()
+# db
+#setup_pid_file()
+#odoo.service.server.start(preload=preload, stop=stop)
+	server = ThreadedServer(odoo.service.wsgi_server.application)
+			odoo.service.wsgi_server.application(environ, start_response):
+				for handler in [wsgi_xmlrpc, odoo.http.root]:
+    		        result = handler(environ, start_response)
+		app= , interface= ,port= , httpd=
+
+
+	rc = server.run(preload, stop)
+		self.start(stop=stop)
+			set signal handler
+			self.http_spawn()
+				t = threading.Thread(target=self.http_thread, name="odoo.service.httpd")
+        		t.start()
+		get signals
+		if signal=stop -> self.stop()
+
+
+self.http_thread
+	def app(e, s):
+    	return self.app(e, s)
+    self.httpd = ThreadedWSGIServerReloadable(self.interface, self.port, app)
+    self.httpd.serve_forever()
+
+class ThreadedWSGIServerReloadable(LoggingBaseWSGIServerMixIn, werkzeug.serving.ThreadedWSGIServer):
+    def __init__(self, host, port, app):
+        super(ThreadedWSGIServerReloadable, self).__init__(host, port, app, handler=RequestHandler)
+    def server_bind(self):
+        envfd = os.environ.get('LISTEN_FDS')
+        if envfd and os.environ.get('LISTEN_PID') == str(os.getpid()):
+            self.reload_socket = True
+            self.socket = socket.fromfd(int(envfd), socket.AF_INET, socket.SOCK_STREAM)
+            # should we os.close(int(envfd)) ? it seem python duplicate the fd.
+        else:
+            self.reload_socket = False
+            super(ThreadedWSGIServerReloadable, self).server_bind()
+    def server_activate(self):
+        if not self.reload_socket:
+            super(ThreadedWSGIServerReloadable, self).server_activate()

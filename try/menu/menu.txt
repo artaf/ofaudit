@@ -1,0 +1,78 @@
+def menu(parent_id=0, menutree=None):
+    menutree = menutree or []
+    cur = g.db.execute('select id, parent, alias, title, ord from static where parent="'+ str(parent_id) +'" and ord>0 order by ord')
+    fetch = cur.fetchall()
+
+    if not fetch:
+        return None
+
+    return [{'id':raw[0], 'parent':raw[1], 'alias':raw[2], 'title':raw[3], 'sub':menu(raw[0])} for raw in fetch]
+
+create table static (
+  id integer primary key autoincrement,
+  parent integer,
+  alias string not null,
+  title string not null,
+  text string not null,
+  ord integer
+);
+
+@app.route('/')
+def index():
+    menu_list = menu()
+    [...]
+    return render_template('index.tpl', **locals())
+
+
+<nav role="navigation">
+  {% for menu in menu_list %}
+  <li>
+    <a{% if page_id == menu.id %} class="active"{% endif %} href="/{{ menu.alias }}">{{ menu.title }}</a>
+    {% if menu.sub %}
+    <ul>
+      {% for sub in menu.sub %}
+      <li><a href="/{{ menu.alias }}/{{ sub.alias }}">{{ sub.title }}</a>
+        {% if sub.sub %}
+        <ul>
+          {% for subsub in sub.sub %}
+          <li><a href="/{{ menu.alias }}/{{ sub.alias }}/{{ subsub.alias }}">{{ subsub.title }}</a>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </li>
+  {% endfor %}
+</nav>
+
+
+
+{% block navbar %}
+<ul>
+    {% for item in nav.top %}
+    <li class="{{ 'active' if item.is_active else '' }}">
+        {{ item }}
+        {% if item.items %}
+        <ul>
+            {% for child in item.items %}
+            <li class="{{ 'active' if child.is_active else '' }}">
+            {{ child }}
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}
+
+nav.Bar('top', [
+    nav.Item('Home', 'index'),
+    nav.Item('Latest News', 'news', {'page': 1}),
+    nav.Item('Nestable', 'nestable', items=[
+        nav.Item('Nested 1', 'nested-1'),
+        nav.Item('Nested 2', 'nested-2'),
+    ]),
+])

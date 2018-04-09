@@ -1,0 +1,13 @@
+* { margin: 0; padding: 0; }
+
+html, body, .wrapper { height: 100%; border: magenta; }
+.contentall { border: 1px solid red; min-height: 100%; padding-bottom: 90px; box-sizing: border-box;}
+
+.userbar {border: 1px solid black;}
+
+/* TODO: remove later */
+#topmenu {border: 1px solid green;}
+
+.cont {border: 1px solid black;  }
+
+.footer {border: 1px solid blue; margin-top: -80px;}

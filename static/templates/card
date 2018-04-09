@@ -1,0 +1,26 @@
+<div class="card-deck">
+
+<div class="card border-primary text-white bg-secondary ">
+    <div class="card-header">Header</div>
+    <div class="card-body">
+        <h5 class="card-title">Card title</h5>
+        <p class="card-text">Some quick example text</p>
+        <a href="#" class="card-link">Card link</a>
+        <a href="#" class="card-link">Another link</a>
+        <div class="card-footer">Footer</div>
+    </div>
+</div>
+
+<div class="card border-primary text-white bg-primary ">
+    <div class="card-header">Header</div>
+    <div class="card-body">
+        <h5 class="card-title">Card title</h5>
+        <p class="card-text">Some quick example text</p>
+        <a href="#" class="card-link">Card link</a>
+        <a href="#" class="card-link">Another link</a>
+        <div class="card-footer">Footer</div>
+    </div>
+</div>
+
+
+</div> <!-- card-deck -->
