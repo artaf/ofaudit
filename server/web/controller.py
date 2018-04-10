@@ -33,10 +33,10 @@ class Menu(http.Controller):
     @http.route('/menu', type='http', auth="user")
     def menu(self):
         # return from DB
-        menu = { 1: 'Menu 1', 2: 'Menu 2', 3: 'Menu 3' }
+        menu = { "1":["Menu 1", False], "2":["Menu 2", False], "3":["Menu 3", { "31":"Menu 3 sub 1", "32":"Menu 3 sub 2"} ] }
         context = CONTEXT.copy()
         context.update( {'menu': menu} )
-        print context
+#        print context
         return http.request.render('menu.mako', qcontext=context)
 
 
